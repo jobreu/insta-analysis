@@ -10,7 +10,7 @@ library(dplyr)
 
 glimpse(insta)
 
-insta1 %>% 
+insta %>% 
   count(author) %>% 
   arrange(desc(n)) %>% 
   head(20)
@@ -21,7 +21,7 @@ library(quanteda)
 
 ## Create corpus ####
 
-insta_corpus <- insta2 %>% 
+insta_corpus <- insta %>% 
   select(id, timestamp, unix_timestamp,
          url, body, 
          author, author_fullname,
@@ -114,10 +114,12 @@ textplot_network(fcmat_users,
 # Network Analysis ####
 
 library(igraph)
+library(tidyr)
+library(stringr)
 
 ## Coauthor & User Tag Networks ####
 
-coauthors <- insta1 %>%
+coauthors <- insta %>%
   filter(!is.na(coauthors)) %>%
   separate_rows(coauthors, sep = ",") %>%
   mutate(coauthors = str_trim(coauthors)) %>%
@@ -134,7 +136,7 @@ plot(g1,
      edge.label = E(g1)$weight,
      main = "Weighted Coauthor Network")
 
-tags <- insta1 %>%
+tags <- insta %>%
   filter(!is.na(usertags)) %>%
   separate_rows(usertags, sep = ",") %>%
   mutate(tags = str_trim(usertags)) %>%
@@ -160,3 +162,15 @@ print(closeness(g1, normalized = T))
 
 print(degree(g2, normalized = T, mode="in"))
 print(degree(g2, normalized = T, mode="out"))
+
+# Filter posts ####
+
+## Filter by date ####
+insta_filtered1 <- insta %>%
+  filter(timestamp >= as.POSIXct("2025-01-01"))
+
+## 50 most recent posts per author ####
+insta_filtered2 <- insta %>%
+  group_by(author) %>%
+  slice_max(order_by = timestamp, n = 50) %>%
+  ungroup()

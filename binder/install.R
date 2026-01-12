@@ -1,5 +1,8 @@
 install.packages(c("dplyr",
+                   "tidyr",
                    "readr",
+                   "stringr",
+                   "ggplot2",
                    "igraph",
                    "quanteda",
                    "quanteda.textplots",
